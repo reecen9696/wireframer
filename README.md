@@ -1,3 +1,39 @@
+# Shuffle Casino Wireframes
+
+A simple Next.js app for creating, editing, and sharing casino wireframes with non-technical stakeholders.
+
+## Tech Stack
+
+- Next.js (App Router)
+- TypeScript
+- TailwindCSS
+- Inter font (Google Fonts)
+- Material Symbols (Google Icons)
+
+## Features
+
+- Home page with grid of wireframe boxes (auto-fetched from central source)
+- Each wireframe routes to its own layout
+- Simple, clean style for speed and clarity
+- Reusable components: Input, Div, Button
+
+## Styling
+
+- Background: #FFFFFF
+- Divs: #F5F5F5
+- Primary text: #020202
+- Buttons: large, rounded, white, outlined #020202
+
+## How to Run
+
+```bash
+npm install
+npm run dev
+```
+
+## Adding Wireframes
+
+Edit `src/data/wireframes.ts` to add new wireframe names. They will appear automatically on the home page.
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
@@ -34,3 +70,4 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# wireframer
