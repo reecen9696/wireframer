@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { wireframes } from "../data/wireframes";
 
 export default function Home() {
   return (
@@ -43,4 +42,5 @@ export default function Home() {
       </footer>
     </div>
   );
+}
 }

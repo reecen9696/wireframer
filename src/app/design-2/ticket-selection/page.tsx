@@ -117,13 +117,6 @@ export default function Design2TicketSelection() {
     setTickets(tickets.filter((_, i) => i !== idx));
   }
 
-  // Toggle favorite for ticket
-  function toggleFavorite(idx: number) {
-    setTickets(
-      tickets.map((t, i) => (i === idx ? { ...t, favorite: !t.favorite } : t))
-    );
-  }
-
   // Toggle powerplay for ticket
   function togglePowerPlayTicket(idx: number) {
     setTickets(
@@ -131,32 +124,8 @@ export default function Design2TicketSelection() {
     );
   }
 
-  // Quick pick for ticket
-  function quickPickTicket(idx: number) {
-    const nums: number[] = [];
-    while (nums.length < 5) {
-      const n = Math.floor(Math.random() * NUMBERS) + 1;
-      if (!nums.includes(n)) nums.push(n);
-    }
-    setTickets(
-      tickets.map((t, i) =>
-        i === idx
-          ? {
-              ...t,
-              numbers: nums,
-              powerball: Math.floor(Math.random() * POWERBALLS) + 1,
-            }
-          : t
-      )
-    );
-  }
-
   // Calculate total
   function getTotal() {
-    let total = tickets.length * TICKET_PRICE;
-    // Add powerplay cost if needed (example: +$1 per powerplay)
-    total += tickets.filter((t) => t.powerPlay).length * 1;
-
     const baseAmount = tickets.length * 0.2;
     const powerPlayAmount = tickets.filter((t) => t.powerPlay).length * 0.1;
     const totalAmount = baseAmount + powerPlayAmount;
@@ -415,6 +384,37 @@ export default function Design2TicketSelection() {
                           powerball: null,
                           powerPlay: true,
                           favorite: false,
+                        },
+                      ]);
+                    }}
+                  >
+                    Quick PowerPlay
+                  </button>
+                </div>
+                <div className="flex items-center justify-end w-full mt-2 px-4 gap-2">
+                  <div className="flex items-center gap-2">
+                    <img
+                      src={getTotal().icon}
+                      alt={getTotal().alt}
+                      className="w-5 h-5"
+                    />
+                    <span className="text-base font-bold text-[#020202]">
+                      {getTotal().amount}
+                    </span>
+                  </div>
+                  <button className="rounded-full bg-[#020202] text-white px-6 py-3 text-base font-bold w-2/3">
+                    Buy Now
+                  </button>
+                </div>
+              </div>
+            </aside>
+          </Div>
+        </main>
+      </div>
+      <ControlPanel showJackpot={showJackpot} onToggleJackpot={setShowJackpot} />
+    </>
+  );
+}
                         },
                       ]);
                     }}
