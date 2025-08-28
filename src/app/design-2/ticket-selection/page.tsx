@@ -411,38 +411,10 @@ export default function Design2TicketSelection() {
           </Div>
         </main>
       </div>
-      <ControlPanel showJackpot={showJackpot} onToggleJackpot={setShowJackpot} />
-    </>
-  );
-}
-                        },
-                      ]);
-                    }}
-                  >
-                    Quick PowerPlay
-                  </button>
-                </div>
-                <div className="flex items-center justify-end w-full mt-2 px-4 gap-2">
-                  <div className="flex items-center gap-2">
-                    <img
-                      src={getTotal().icon}
-                      alt={getTotal().alt}
-                      className="w-5 h-5"
-                    />
-                    <span className="text-base font-bold text-[#020202]">
-                      {getTotal().amount}
-                    </span>
-                  </div>
-                  <button className="rounded-full bg-[#020202] text-white px-6 py-3 text-base font-bold w-2/3">
-                    Buy Now
-                  </button>
-                </div>
-              </div>
-            </aside>
-          </Div>
-        </main>
-      </div>
-      <ControlPanel showJackpot={showJackpot} onToggleJackpot={setShowJackpot} />
+      <ControlPanel
+        showJackpot={showJackpot}
+        onToggleJackpot={setShowJackpot}
+      />
     </>
   );
 }
