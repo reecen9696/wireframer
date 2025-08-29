@@ -1,29 +1,37 @@
 import { notFound } from "next/navigation";
-import { wireframes } from "../../data/wireframes";
-import { Div } from "../../components/Div";
 
-interface Props {
-  params: { wireframe: string };
+interface PageProps {
+  params: Promise<{ wireframe: string }>;
 }
 
-export default async function WireframePage({ params }: Props) {
-  const wireframeParam = await params.wireframe;
-  const wireframeName = wireframes.find(
-    (wf) => wf.name.replace(/\s+/g, "-").toLowerCase() === wireframeParam
-  )?.name;
+const wireframes = ["design-1", "design-2", "design-3"];
 
-  if (!wireframeName) return notFound();
+export default async function WireframePage({ params }: PageProps) {
+  const { wireframe } = await params;
+
+  if (!wireframes.includes(wireframe)) {
+    notFound();
+  }
 
   return (
-    <div className="min-h-screen bg-[#FFFFFF] font-sans flex flex-col items-center py-10">
-      <Div className="w-full max-w-3xl mx-auto text-center">
-        <h2 className="text-3xl font-bold mb-4 text-[#020202]">
-          {wireframeName}
-        </h2>
-        <p className="text-lg text-[#020202]">
-          Wireframe layout for {wireframeName} goes here.
-        </p>
-      </Div>
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center">
+      <div className="w-full max-w-4xl p-8 text-center">
+        <h1 className="text-4xl font-bold text-[#020202] mb-8">
+          {wireframe.charAt(0).toUpperCase() +
+            wireframe.slice(1).replace("-", " ")}
+        </h1>
+        <div className="bg-[#F5F5F5] rounded-xl p-8">
+          <p className="text-xl text-[#020202]">
+            This is the {wireframe} wireframe page.
+          </p>
+        </div>
+      </div>
     </div>
   );
+}
+
+export async function generateStaticParams() {
+  return wireframes.map((wireframe) => ({
+    wireframe,
+  }));
 }

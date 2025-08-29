@@ -1,12 +1,12 @@
 "use client";
 import { useState } from "react";
+import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import { Div } from "@/components/Div";
 import ControlPanel from "@/components/ControlPanel";
 
 const NUMBERS = 69;
 const POWERBALLS = 26;
-const TICKET_PRICE = 2;
 
 type Ticket = {
   numbers: number[];
@@ -393,10 +393,11 @@ export default function Design2TicketSelection() {
                 </div>
                 <div className="flex items-center justify-end w-full mt-2 px-4 gap-2">
                   <div className="flex items-center gap-2">
-                    <img
+                    <Image
                       src={getTotal().icon}
                       alt={getTotal().alt}
-                      className="w-5 h-5"
+                      width={20}
+                      height={20}
                     />
                     <span className="text-base font-bold text-[#020202]">
                       {getTotal().amount}

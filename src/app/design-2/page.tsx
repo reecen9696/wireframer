@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
+import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import { Div } from "@/components/Div";
 import ControlPanel from "@/components/ControlPanel";
@@ -191,7 +192,6 @@ const mockRounds: Round[] = [
 
 export default function Design1Home() {
   const [currency, setCurrency] = useState("SOL");
-  const [ticketCount] = useState(1); // For amount display, default 1
   const [currentRoundIndex, setCurrentRoundIndex] = useState(0);
   const [showResults, setShowResults] = useState(true);
   const [tableView, setTableView] = useState<"results" | "tickets" | "winning">(
@@ -211,17 +211,6 @@ export default function Design1Home() {
       setCurrentRoundIndex(currentRoundIndex - 1);
     }
   };
-
-  function getAmount() {
-    switch (currency) {
-      case "SOL":
-        return `${((2 * ticketCount) / 4.3).toFixed(2)}`;
-      case "ETH":
-        return `${((2 * ticketCount) / 0.23).toFixed(2)}`;
-      default:
-        return `${(2 * ticketCount).toFixed(2)}`;
-    }
-  }
 
   return (
     <div className="min-h-screen bg-white flex flex-col items-center">
@@ -379,14 +368,15 @@ export default function Design1Home() {
                             </td>
                             <td className="p-4">
                               <div className="flex items-center gap-2">
-                                <img
+                                <Image
                                   src={
                                     currency === "ETH"
                                       ? "/eth.svg"
                                       : "/solana.svg"
                                   }
                                   alt={currency}
-                                  className="w-5 h-5"
+                                  width={20}
+                                  height={20}
                                 />
                                 <span className="text-[#020202] font-bold">
                                   {result.prize}
@@ -467,14 +457,15 @@ export default function Design1Home() {
                             </td>
                             <td className="p-4">
                               <div className="flex items-center gap-2">
-                                <img
+                                <Image
                                   src={
                                     currency === "ETH"
                                       ? "/eth.svg"
                                       : "/solana.svg"
                                   }
                                   alt={currency}
-                                  className="w-5 h-5"
+                                  width={20}
+                                  height={20}
                                 />
                                 <span className="text-[#020202] font-bold">
                                   {ticket.stake}
@@ -483,14 +474,15 @@ export default function Design1Home() {
                             </td>
                             <td className="p-4">
                               <div className="flex items-center gap-2">
-                                <img
+                                <Image
                                   src={
                                     currency === "ETH"
                                       ? "/eth.svg"
                                       : "/solana.svg"
                                   }
                                   alt={currency}
-                                  className="w-5 h-5"
+                                  width={20}
+                                  height={20}
                                 />
                                 <span className="text-[#020202] font-bold">
                                   {ticket.winnings}
@@ -565,14 +557,15 @@ export default function Design1Home() {
                               </td>
                               <td className="p-4">
                                 <div className="flex items-center gap-2">
-                                  <img
+                                  <Image
                                     src={
                                       currency === "ETH"
                                         ? "/eth.svg"
                                         : "/solana.svg"
                                     }
                                     alt={currency}
-                                    className="w-5 h-5"
+                                    width={20}
+                                    height={20}
                                   />
                                   <span className="text-[#020202] font-bold">
                                     {ticket.stake}
@@ -581,14 +574,15 @@ export default function Design1Home() {
                               </td>
                               <td className="p-4">
                                 <div className="flex items-center gap-2">
-                                  <img
+                                  <Image
                                     src={
                                       currency === "ETH"
                                         ? "/eth.svg"
                                         : "/solana.svg"
                                     }
                                     alt={currency}
-                                    className="w-5 h-5"
+                                    width={20}
+                                    height={20}
                                   />
                                   <span className="text-[#020202] font-bold">
                                     {ticket.winnings}

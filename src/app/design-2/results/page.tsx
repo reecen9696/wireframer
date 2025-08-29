@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import { Div } from "@/components/Div";
 
@@ -173,7 +174,7 @@ export default function Design2Results() {
     <>
       <Navbar currency={currency} setCurrency={setCurrency} />
       <div className="min-h-screen bg-white flex flex-col items-center">
-        <main className="w-full max-w-[1200px] flex flex-col items-center pt-12 pb-12 px-4">
+        <main className="w-full max-w-[1200px] pt-24 pb-12 px-4">
           {/* Central Box */}
           <Div className="w-full max-w-4xl p-8 mb-8">
             {/* Round Info */}
@@ -261,12 +262,13 @@ export default function Design2Results() {
                       </td>
                       <td className="p-4">
                         <div className="flex items-center gap-2">
-                          <img
+                          <Image
                             src={
                               currency === "ETH" ? "/eth.svg" : "/solana.svg"
                             }
                             alt={currency}
-                            className="w-5 h-5"
+                            width={20}
+                            height={20}
                           />
                           <span className="text-[#020202] font-bold">
                             {result.prize}

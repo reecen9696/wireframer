@@ -1,6 +1,6 @@
 import React from "react";
 
-interface DivProps extends React.HTMLAttributes<HTMLDivElement> {}
+type DivProps = React.HTMLAttributes<HTMLDivElement>;
 
 export const Div: React.FC<DivProps> = ({ children, ...props }) => (
   <div

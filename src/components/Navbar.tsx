@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import Image from "next/image";
 
 type NavbarProps = {
   currency: string;
@@ -21,9 +22,9 @@ export default function Navbar({ currency, setCurrency }: NavbarProps) {
         <div className="flex items-center bg-white rounded-xl border-2 border-[#020202] px-6 py-2 gap-3 shadow-sm">
           <span className="w-7 h-7 flex items-center justify-center rounded-full border border-[#020202] bg-white">
             {currency === "ETH" ? (
-              <img src="/eth.svg" alt="ETH" className="w-5 h-5" />
+              <Image src="/eth.svg" alt="ETH" width={20} height={20} />
             ) : currency === "SOL" ? (
-              <img src="/solana.svg" alt="SOL" className="w-5 h-5" />
+              <Image src="/solana.svg" alt="SOL" width={20} height={20} />
             ) : null}
           </span>
           <span className="font-bold text-[#020202] text-xl">
