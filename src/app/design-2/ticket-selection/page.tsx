@@ -34,6 +34,7 @@ export default function Design2TicketSelection() {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [showWinEvent, setShowWinEvent] = useState(false);
   const [wonState, setWonState] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   const { isWalletConnected } = useWallet();
 
@@ -148,13 +149,6 @@ export default function Design2TicketSelection() {
       setEditingIndex(editingIndex - 1);
     }
     setTickets(tickets.filter((_, i) => i !== idx));
-  }
-
-  // Toggle powerplay for ticket
-  function togglePowerPlayTicket(idx: number) {
-    setTickets(
-      tickets.map((t, i) => (i === idx ? { ...t, powerPlay: !t.powerPlay } : t))
-    );
   }
 
   // Calculate total
@@ -472,6 +466,8 @@ export default function Design2TicketSelection() {
       <ControlPanel
         showJackpot={showJackpot}
         onToggleJackpot={setShowJackpot}
+        showLeaderboard={showLeaderboard}
+        onToggleLeaderboard={setShowLeaderboard}
         wonState={wonState}
         onToggleWonState={setWonState}
         onTriggerWinEvent={handleTriggerWinEvent}

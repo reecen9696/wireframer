@@ -1,8 +1,7 @@
 "use client";
-import Link from "next/link";
 import { useState } from "react";
-import Image from "next/image";
 import Navbar from "@/components/Navbar";
+import Link from "next/link";
 
 export default function Design1Home() {
   const [currency, setCurrency] = useState("SOL");

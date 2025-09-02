@@ -6,6 +6,8 @@ interface ControlPanelProps {
   onToggleResults?: (show: boolean) => void;
   showJackpot?: boolean;
   onToggleJackpot?: (show: boolean) => void;
+  showLeaderboard?: boolean;
+  onToggleLeaderboard?: (show: boolean) => void;
   wonState?: boolean;
   onToggleWonState?: (show: boolean) => void;
   onTriggerWinEvent?: () => void;
@@ -16,6 +18,8 @@ export default function ControlPanel({
   onToggleResults,
   showJackpot,
   onToggleJackpot,
+  showLeaderboard,
+  onToggleLeaderboard,
   wonState,
   onToggleWonState,
   onTriggerWinEvent,
@@ -97,6 +101,24 @@ export default function ControlPanel({
                   <div
                     className={`w-4 h-4 rounded-full bg-white absolute top-0.5 transition-transform ${
                       showJackpot ? "translate-x-6" : "translate-x-0.5"
+                    }`}
+                  />
+                </button>
+              </div>
+            )}
+
+            {onToggleLeaderboard && (
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-[#020202]">Show Leaderboard</span>
+                <button
+                  onClick={() => onToggleLeaderboard(!showLeaderboard)}
+                  className={`w-12 h-6 rounded-full border-2 border-[#020202] relative transition-colors ${
+                    showLeaderboard ? "bg-green-500" : "bg-gray-300"
+                  }`}
+                >
+                  <div
+                    className={`w-4 h-4 rounded-full bg-white absolute top-0.5 transition-transform ${
+                      showLeaderboard ? "translate-x-6" : "translate-x-0.5"
                     }`}
                   />
                 </button>

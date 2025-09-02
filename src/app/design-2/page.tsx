@@ -262,13 +262,53 @@ const mockRounds: Round[] = [
   },
 ];
 
+const mockLeaderboard = [
+  {
+    id: 1,
+    user: { name: "shuffleboi32", avatar: "/sapphire.svg", isHidden: false },
+    betAmount: "500.00",
+    payout: "2,500.00",
+  },
+  {
+    id: 2,
+    user: { name: "cryptoking", avatar: "/anonymous.svg", isHidden: true },
+    betAmount: "1,200.00",
+    payout: "15,000.00",
+  },
+  {
+    id: 3,
+    user: { name: "luckyplayer", avatar: "/sapphire.svg", isHidden: false },
+    betAmount: "250.00",
+    payout: "875.00",
+  },
+  {
+    id: 4,
+    user: { name: "anonymous", avatar: "/anonymous.svg", isHidden: true },
+    betAmount: "800.00",
+    payout: "4,200.00",
+  },
+  {
+    id: 5,
+    user: { name: "powerball_pro", avatar: "/sapphire.svg", isHidden: false },
+    betAmount: "150.00",
+    payout: "600.00",
+  },
+  {
+    id: 6,
+    user: { name: "hidden_whale", avatar: "/anonymous.svg", isHidden: true },
+    betAmount: "2,000.00",
+    payout: "25,000.00",
+  },
+];
+
 export default function Design1Home() {
   const [currency, setCurrency] = useState("SOL");
   const [currentRoundIndex, setCurrentRoundIndex] = useState(0);
   const [showResults, setShowResults] = useState(true);
-  const [tableView, setTableView] = useState<"results" | "tickets" | "winning">(
-    "results"
-  );
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [tableView, setTableView] = useState<
+    "leaderboard" | "results" | "tickets" | "winning"
+  >("results");
   const [showWinEvent, setShowWinEvent] = useState(false);
   const [wonState, setWonState] = useState(false);
   const [timeLeft, setTimeLeft] = useState({
@@ -345,6 +385,13 @@ export default function Design1Home() {
     scrollToResults();
   };
 
+  // Effect to handle tableView when leaderboard toggle changes
+  useEffect(() => {
+    if (!showLeaderboard && tableView === "leaderboard") {
+      setTableView("results");
+    }
+  }, [showLeaderboard, tableView]);
+
   return (
     <div className="min-h-screen bg-white flex flex-col items-center">
       <Navbar currency={currency} setCurrency={setCurrency} />
@@ -357,7 +404,7 @@ export default function Design1Home() {
             // Won State Hero
             <>
               <h1 className="text-5xl font-extrabold text-[#020202] text-center mb-6">
-                🎉 You've Won! 🎉
+                🎉 You&apos;ve Won! 🎉
               </h1>
               <div className="text-2xl font-semibold text-[#020202] text-center mb-8">
                 Click to claim tickets
@@ -465,6 +512,18 @@ export default function Design1Home() {
               <Div className="w-full p-8 min-h-[500px]">
                 {/* Table View Toggles - Fixed width */}
                 <div className="flex gap-2 mb-6 w-full">
+                  {showLeaderboard && (
+                    <button
+                      onClick={() => setTableView("leaderboard")}
+                      className={`px-4 py-2 rounded-full border-2 border-[#020202] font-semibold min-w-[120px] ${
+                        tableView === "leaderboard"
+                          ? "bg-[#020202] text-white"
+                          : "bg-white text-[#020202]"
+                      }`}
+                    >
+                      Leaderboard
+                    </button>
+                  )}
                   <button
                     onClick={() => setTableView("results")}
                     className={`px-4 py-2 rounded-full border-2 border-[#020202] font-semibold min-w-[100px] ${
@@ -505,6 +564,92 @@ export default function Design1Home() {
 
                 {/* Table Content Container - Fixed height to prevent jumping */}
                 <div className="w-full">
+                  {/* Leaderboard Table */}
+                  {tableView === "leaderboard" && (
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse">
+                        <thead>
+                          <tr className="border-b-2 border-[#020202]">
+                            <th className="text-left p-4 text-lg font-bold text-[#020202]">
+                              User
+                            </th>
+                            <th className="text-left p-4 text-lg font-bold text-[#020202]">
+                              Bet Amount
+                            </th>
+                            <th className="text-left p-4 text-lg font-bold text-[#020202]">
+                              Payout
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {mockLeaderboard.map((entry) => (
+                            <tr
+                              key={entry.id}
+                              className="border-b border-[#E5E5E5]"
+                            >
+                              <td className="p-4">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden">
+                                    <Image
+                                      src={entry.user.avatar}
+                                      alt={
+                                        entry.user.isHidden
+                                          ? "Anonymous"
+                                          : entry.user.name
+                                      }
+                                      width={40}
+                                      height={40}
+                                      className="rounded-full"
+                                    />
+                                  </div>
+                                  <span className="text-[#020202] font-semibold">
+                                    {entry.user.isHidden
+                                      ? "Anonymous"
+                                      : entry.user.name}
+                                  </span>
+                                </div>
+                              </td>
+                              <td className="p-4">
+                                <div className="flex items-center gap-2">
+                                  <Image
+                                    src={
+                                      currency === "ETH"
+                                        ? "/eth.svg"
+                                        : "/solana.svg"
+                                    }
+                                    alt={currency}
+                                    width={20}
+                                    height={20}
+                                  />
+                                  <span className="text-[#020202] font-bold">
+                                    {entry.betAmount}
+                                  </span>
+                                </div>
+                              </td>
+                              <td className="p-4">
+                                <div className="flex items-center gap-2">
+                                  <Image
+                                    src={
+                                      currency === "ETH"
+                                        ? "/eth.svg"
+                                        : "/solana.svg"
+                                    }
+                                    alt={currency}
+                                    width={20}
+                                    height={20}
+                                  />
+                                  <span className="text-[#020202] font-bold">
+                                    {entry.payout}
+                                  </span>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+
                   {/* Results Table */}
                   {tableView === "results" && (
                     <div className="overflow-x-auto">
@@ -527,7 +672,10 @@ export default function Design1Home() {
                         </thead>
                         <tbody>
                           {currentRound.results.map((result, index) => (
-                            <tr key={index} className="border-b border-[#E5E5E5]">
+                            <tr
+                              key={index}
+                              className="border-b border-[#E5E5E5]"
+                            >
                               <td className="p-4 text-[#020202] font-semibold">
                                 {result.division}
                               </td>
@@ -730,67 +878,69 @@ export default function Design1Home() {
                           </thead>
                           <tbody>
                             {currentRound.winningTickets.length > 0 ? (
-                              currentRound.winningTickets.map((ticket, index) => (
-                                <tr
-                                  key={index}
-                                  className="border-b border-[#E5E5E5]"
-                                >
-                                  <td className="p-4">
-                                    <div className="flex gap-2 items-center">
-                                      {ticket.numbers.map((num, i) => (
-                                        <span
-                                          key={i}
-                                          className="w-8 h-8 rounded-full border-2 border-[#020202] bg-[#eaeaea] text-[#020202] flex items-center justify-center text-sm font-bold"
-                                        >
-                                          {num}
+                              currentRound.winningTickets.map(
+                                (ticket, index) => (
+                                  <tr
+                                    key={index}
+                                    className="border-b border-[#E5E5E5]"
+                                  >
+                                    <td className="p-4">
+                                      <div className="flex gap-2 items-center">
+                                        {ticket.numbers.map((num, i) => (
+                                          <span
+                                            key={i}
+                                            className="w-8 h-8 rounded-full border-2 border-[#020202] bg-[#eaeaea] text-[#020202] flex items-center justify-center text-sm font-bold"
+                                          >
+                                            {num}
+                                          </span>
+                                        ))}
+                                        <span className="w-8 h-8 rounded-full border-2 border-red-500 bg-red-500 text-white flex items-center justify-center text-sm font-bold">
+                                          {ticket.powerball}
                                         </span>
-                                      ))}
-                                      <span className="w-8 h-8 rounded-full border-2 border-red-500 bg-red-500 text-white flex items-center justify-center text-sm font-bold">
-                                        {ticket.powerball}
+                                      </div>
+                                    </td>
+                                    <td className="p-4">
+                                      <div className="flex items-center gap-2">
+                                        <Image
+                                          src={
+                                            currency === "ETH"
+                                              ? "/eth.svg"
+                                              : "/solana.svg"
+                                          }
+                                          alt={currency}
+                                          width={20}
+                                          height={20}
+                                        />
+                                        <span className="text-[#020202] font-bold">
+                                          {ticket.stake}
+                                        </span>
+                                      </div>
+                                    </td>
+                                    <td className="p-4">
+                                      <div className="flex items-center gap-2">
+                                        <Image
+                                          src={
+                                            currency === "ETH"
+                                              ? "/eth.svg"
+                                              : "/solana.svg"
+                                          }
+                                          alt={currency}
+                                          width={20}
+                                          height={20}
+                                        />
+                                        <span className="text-[#020202] font-bold">
+                                          {ticket.winnings}
+                                        </span>
+                                      </div>
+                                    </td>
+                                    <td className="p-4">
+                                      <span className="px-3 py-1 rounded-full bg-green-100 text-green-800 text-sm font-bold">
+                                        {ticket.division}
                                       </span>
-                                    </div>
-                                  </td>
-                                  <td className="p-4">
-                                    <div className="flex items-center gap-2">
-                                      <Image
-                                        src={
-                                          currency === "ETH"
-                                            ? "/eth.svg"
-                                            : "/solana.svg"
-                                        }
-                                        alt={currency}
-                                        width={20}
-                                        height={20}
-                                      />
-                                      <span className="text-[#020202] font-bold">
-                                        {ticket.stake}
-                                      </span>
-                                    </div>
-                                  </td>
-                                  <td className="p-4">
-                                    <div className="flex items-center gap-2">
-                                      <Image
-                                        src={
-                                          currency === "ETH"
-                                            ? "/eth.svg"
-                                            : "/solana.svg"
-                                        }
-                                        alt={currency}
-                                        width={20}
-                                        height={20}
-                                      />
-                                      <span className="text-[#020202] font-bold">
-                                        {ticket.winnings}
-                                      </span>
-                                    </div>
-                                  </td>
-                                  <td className="p-4">
-                                    <span className="px-3 py-1 rounded-full bg-green-100 text-green-800 text-sm font-bold">
-                                      {ticket.division}
-                                    </span>
-                                  </td>
-                                </tr>
-                              ))
+                                    </td>
+                                  </tr>
+                                )
+                              )
                             ) : (
                               <tr>
                                 <td colSpan={4} className="p-8 text-center">
@@ -815,6 +965,8 @@ export default function Design1Home() {
       <ControlPanel
         showResults={showResults}
         onToggleResults={setShowResults}
+        showLeaderboard={showLeaderboard}
+        onToggleLeaderboard={setShowLeaderboard}
         wonState={wonState}
         onToggleWonState={setWonState}
         onTriggerWinEvent={handleTriggerWinEvent}
