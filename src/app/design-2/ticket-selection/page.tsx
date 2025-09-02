@@ -33,6 +33,7 @@ export default function Design2TicketSelection() {
   const [showJackpot, setShowJackpot] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [showWinEvent, setShowWinEvent] = useState(false);
+  const [wonState, setWonState] = useState(false);
 
   const { isWalletConnected } = useWallet();
 
@@ -471,6 +472,8 @@ export default function Design2TicketSelection() {
       <ControlPanel
         showJackpot={showJackpot}
         onToggleJackpot={setShowJackpot}
+        wonState={wonState}
+        onToggleWonState={setWonState}
         onTriggerWinEvent={handleTriggerWinEvent}
       />
 

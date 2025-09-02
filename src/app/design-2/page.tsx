@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import { Div } from "@/components/Div";
@@ -117,6 +117,27 @@ const mockRounds: Round[] = [
         winnings: "0.00000",
         status: "lost",
       },
+      {
+        numbers: [1, 15, 29, 38, 62],
+        powerball: 18,
+        stake: "0.20000",
+        winnings: "8.75000",
+        status: "won",
+      },
+      {
+        numbers: [9, 22, 31, 47, 68],
+        powerball: 12,
+        stake: "0.20000",
+        winnings: "0.00000",
+        status: "lost",
+      },
+      {
+        numbers: [3, 18, 27, 44, 59],
+        powerball: 18,
+        stake: "0.20000",
+        winnings: "4.25000",
+        status: "won",
+      },
     ],
     winningTickets: [
       {
@@ -125,6 +146,20 @@ const mockRounds: Round[] = [
         stake: "0.20000",
         winnings: "43.50000",
         division: "4th",
+      },
+      {
+        numbers: [1, 15, 29, 38, 62],
+        powerball: 18,
+        stake: "0.20000",
+        winnings: "8.75000",
+        division: "6th",
+      },
+      {
+        numbers: [3, 18, 27, 44, 59],
+        powerball: 18,
+        stake: "0.20000",
+        winnings: "4.25000",
+        division: "7th",
       },
     ],
   },
@@ -179,6 +214,27 @@ const mockRounds: Round[] = [
         winnings: "0.00000",
         status: "lost",
       },
+      {
+        numbers: [6, 11, 33, 45, 67],
+        powerball: 22,
+        stake: "0.20000",
+        winnings: "38650.22150",
+        status: "won",
+      },
+      {
+        numbers: [2, 19, 28, 41, 56],
+        powerball: 9,
+        stake: "0.20000",
+        winnings: "0.00000",
+        status: "lost",
+      },
+      {
+        numbers: [4, 13, 24, 37, 52],
+        powerball: 22,
+        stake: "0.20000",
+        winnings: "19850.15720",
+        status: "won",
+      },
     ],
     winningTickets: [
       {
@@ -187,6 +243,20 @@ const mockRounds: Round[] = [
         stake: "0.20000",
         winnings: "485420.31250",
         division: "Jackpot",
+      },
+      {
+        numbers: [6, 11, 33, 45, 67],
+        powerball: 22,
+        stake: "0.20000",
+        winnings: "38650.22150",
+        division: "2nd",
+      },
+      {
+        numbers: [4, 13, 24, 37, 52],
+        powerball: 22,
+        stake: "0.20000",
+        winnings: "19850.15720",
+        division: "3rd",
       },
     ],
   },
@@ -200,8 +270,54 @@ export default function Design1Home() {
     "results"
   );
   const [showWinEvent, setShowWinEvent] = useState(false);
+  const [wonState, setWonState] = useState(false);
+  const [timeLeft, setTimeLeft] = useState({
+    hours: 2,
+    minutes: 13,
+    seconds: 45,
+  });
 
+  const resultsRef = useRef<HTMLDivElement>(null);
   const { isWalletConnected, connectWallet } = useWallet();
+
+  // Countdown timer effect
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        let { hours, minutes, seconds } = prev;
+
+        if (seconds > 0) {
+          seconds--;
+        } else if (minutes > 0) {
+          minutes--;
+          seconds = 59;
+        } else if (hours > 0) {
+          hours--;
+          minutes = 59;
+          seconds = 59;
+        }
+
+        return { hours, minutes, seconds };
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatTime = (time: typeof timeLeft) => {
+    return `${time.hours.toString().padStart(2, "0")}:${time.minutes
+      .toString()
+      .padStart(2, "0")}:${time.seconds.toString().padStart(2, "0")}`;
+  };
+
+  const scrollToResults = () => {
+    if (resultsRef.current) {
+      resultsRef.current.scrollIntoView({ behavior: "smooth" });
+      setTableView("winning");
+      // Switch out of won state after claiming tickets
+      setWonState(false);
+    }
+  };
 
   const currentRound = mockRounds[currentRoundIndex];
 
@@ -225,6 +341,10 @@ export default function Design1Home() {
     setShowWinEvent(false);
   };
 
+  const handleClaimNow = () => {
+    scrollToResults();
+  };
+
   return (
     <div className="min-h-screen bg-white flex flex-col items-center">
       <Navbar currency={currency} setCurrency={setCurrency} />
@@ -233,29 +353,50 @@ export default function Design1Home() {
       <main className="flex flex-col items-center justify-center w-full pt-24 pb-12 px-4">
         <div className="w-full max-w-[1200px] flex flex-col items-center">
           {/* Hero Section */}
-          <h1 className="text-5xl font-extrabold text-[#020202] text-center mb-6">
-            Powerball
-          </h1>
-          <div className="text-6xl font-extrabold text-[#020202] text-center mb-4">
-            $815,000,000
-          </div>
-          <div className="text-2xl font-semibold text-[#020202] text-center mb-2">
-            Closes in 02:13:45
-          </div>
-          <div className="text-base text-[#020202] text-center mb-8">
-            Draws Aug 28, 9:00 PM EST
-          </div>
-          <Link href="/design-2/ticket-selection">
-            <button className="rounded-full border-2 border-[#020202] bg-white text-[#020202] px-10 py-2 text-1xl font-bold mt-2">
-              Play Now
-            </button>
-          </Link>
+          {wonState ? (
+            // Won State Hero
+            <>
+              <h1 className="text-5xl font-extrabold text-[#020202] text-center mb-6">
+                🎉 You've Won! 🎉
+              </h1>
+              <div className="text-2xl font-semibold text-[#020202] text-center mb-8">
+                Click to claim tickets
+              </div>
+              <button
+                onClick={scrollToResults}
+                className="rounded-full border-2 border-[#020202] bg-[#020202] text-white px-10 py-2 text-1xl font-bold mt-2 hover:bg-gray-800"
+              >
+                Claim Tickets
+              </button>
+            </>
+          ) : (
+            // Normal State Hero
+            <>
+              <h1 className="text-5xl font-extrabold text-[#020202] text-center mb-6">
+                Powerball
+              </h1>
+              <div className="text-6xl font-extrabold text-[#020202] text-center mb-4">
+                $815,000,000
+              </div>
+              <div className="text-2xl font-semibold text-[#020202] text-center mb-2">
+                Closes in {formatTime(timeLeft)}
+              </div>
+              <div className="text-base text-[#020202] text-center mb-8">
+                Draws Aug 28, 9:00 PM EST
+              </div>
+              <Link href="/design-2/ticket-selection">
+                <button className="rounded-full border-2 border-[#020202] bg-white text-[#020202] px-10 py-2 text-1xl font-bold mt-2">
+                  Play Now
+                </button>
+              </Link>
+            </>
+          )}
         </div>
 
         {showResults && (
-          <>
+          <div ref={resultsRef}>
+            {/* Round Info */}
             <Div className="rounded-full px-4 mt-24">
-              {/* Round Info */}
               <div className="text-center mb-6">
                 <h2 className="text-md font-bold text-[#020202] mb-2">
                   Round #{currentRound.number}
@@ -317,7 +458,7 @@ export default function Design1Home() {
               </div>
             </Div>
             {/* Results Section */}
-            <div className="w-full max-w-[1200px] mt-16">
+            <div className="w-full max-w-[1200px] mt-16 mb-32">
               <Div className="w-full p-8">
                 {/* Table View Toggles */}
                 <div className="flex gap-2 mb-6">
@@ -448,7 +589,7 @@ export default function Design1Home() {
                           onClick={connectWallet}
                           className="rounded-full border-2 border-[#020202] bg-white text-[#020202] px-6 py-2 font-bold"
                         >
-                          Connect Wallet
+                          Connect
                         </button>
                       </div>
                     ) : (
@@ -561,7 +702,7 @@ export default function Design1Home() {
                           onClick={connectWallet}
                           className="rounded-full border-2 border-[#020202] bg-white text-[#020202] px-6 py-2 font-bold"
                         >
-                          Connect Wallet
+                          Connect
                         </button>
                       </div>
                     ) : (
@@ -661,13 +802,15 @@ export default function Design1Home() {
                 )}
               </Div>
             </div>
-          </>
+          </div>
         )}
       </main>
 
       <ControlPanel
         showResults={showResults}
         onToggleResults={setShowResults}
+        wonState={wonState}
+        onToggleWonState={setWonState}
         onTriggerWinEvent={handleTriggerWinEvent}
       />
 
@@ -679,6 +822,7 @@ export default function Design1Home() {
         drawNumber={52}
         winningNumbers={[8, 15, 29, 44, 58]}
         powerball={22}
+        onClaimNow={handleClaimNow}
       />
     </div>
   );

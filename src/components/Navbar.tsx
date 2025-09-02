@@ -54,7 +54,7 @@ export default function Navbar({ currency, setCurrency }: NavbarProps) {
             className="rounded-full border-2 border-[#020202] bg-white text-[#020202] px-6 py-2 font-bold"
             onClick={connectWallet}
           >
-            Connect Wallet
+            Connect
           </button>
         )}
       </div>

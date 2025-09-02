@@ -11,6 +11,7 @@ interface WinEventProps {
   drawNumber: number;
   winningNumbers: number[];
   powerball: number;
+  onClaimNow?: () => void;
 }
 
 export default function WinEventPopup({
@@ -21,6 +22,7 @@ export default function WinEventPopup({
   drawNumber,
   winningNumbers,
   powerball,
+  onClaimNow,
 }: WinEventProps) {
   const [windowDimensions, setWindowDimensions] = useState({
     width: 0,
@@ -47,10 +49,10 @@ export default function WinEventPopup({
   useEffect(() => {
     if (isOpen) {
       setShowConfetti(true);
-      // Stop confetti after 5 seconds
+      // Stop confetti after 8 seconds (longer duration)
       const timer = setTimeout(() => {
         setShowConfetti(false);
-      }, 5000);
+      }, 8000);
 
       return () => clearTimeout(timer);
     } else {
@@ -59,6 +61,9 @@ export default function WinEventPopup({
   }, [isOpen]);
 
   const handleClaimNow = () => {
+    if (onClaimNow) {
+      onClaimNow();
+    }
     onClose();
   };
 
@@ -71,8 +76,8 @@ export default function WinEventPopup({
         <Confetti
           width={windowDimensions.width}
           height={windowDimensions.height}
-          numberOfPieces={200}
-          recycle={false}
+          numberOfPieces={400}
+          recycle={true}
           colors={[
             "#FFD700",
             "#FF6B6B",
@@ -80,17 +85,22 @@ export default function WinEventPopup({
             "#45B7D1",
             "#96CEB4",
             "#FFEAA7",
+            "#FF69B4",
+            "#32CD32",
+            "#FF4500",
+            "#9370DB",
           ]}
-          gravity={0.3}
-          initialVelocityX={5}
-          initialVelocityY={20}
+          gravity={0.2}
+          initialVelocityX={8}
+          initialVelocityY={25}
+          wind={0.05}
         />
       )}
 
       {/* Background overlay */}
       <div
         className="absolute inset-0"
-        style={{ backgroundColor: "rgba(64, 64, 64, 0.8)" }}
+        style={{ backgroundColor: "rgba(32, 32, 32, 0.85)" }}
         onClick={onClose}
       />
       {/* Popup content */}
@@ -98,7 +108,7 @@ export default function WinEventPopup({
         <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl transform transition-all duration-300 ease-out">
           {/* Header */}
           <div className="text-center mb-6">
-            <h1 className="text-4xl font-extrabold text-green-600 mb-2">
+            <h1 className="text-4xl font-extrabold text-[#020202] mb-2">
               🎉 You Won! 🎉
             </h1>
             <div className="flex items-center justify-center gap-2 mb-2">
@@ -145,7 +155,7 @@ export default function WinEventPopup({
           <div className="flex flex-col gap-3">
             <button
               onClick={handleClaimNow}
-              className="w-full rounded-full border-2 border-green-600 bg-green-600 text-white px-6 py-3 font-bold hover:bg-green-700 transition-colors"
+              className="w-full rounded-full border-2 border-[#020202] bg-[#020202] text-white px-6 py-3 font-bold hover:bg-gray-800 transition-colors"
             >
               Claim Now
             </button>

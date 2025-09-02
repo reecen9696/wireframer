@@ -6,6 +6,8 @@ interface ControlPanelProps {
   onToggleResults?: (show: boolean) => void;
   showJackpot?: boolean;
   onToggleJackpot?: (show: boolean) => void;
+  wonState?: boolean;
+  onToggleWonState?: (show: boolean) => void;
   onTriggerWinEvent?: () => void;
 }
 
@@ -14,6 +16,8 @@ export default function ControlPanel({
   onToggleResults,
   showJackpot,
   onToggleJackpot,
+  wonState,
+  onToggleWonState,
   onTriggerWinEvent,
 }: ControlPanelProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,7 +25,10 @@ export default function ControlPanel({
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
+      if (
+        panelRef.current &&
+        !panelRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     }
@@ -90,6 +97,24 @@ export default function ControlPanel({
                   <div
                     className={`w-4 h-4 rounded-full bg-white absolute top-0.5 transition-transform ${
                       showJackpot ? "translate-x-6" : "translate-x-0.5"
+                    }`}
+                  />
+                </button>
+              </div>
+            )}
+
+            {onToggleWonState && (
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-[#020202]">Won State</span>
+                <button
+                  onClick={() => onToggleWonState(!wonState)}
+                  className={`w-12 h-6 rounded-full border-2 border-[#020202] relative transition-colors ${
+                    wonState ? "bg-green-500" : "bg-gray-300"
+                  }`}
+                >
+                  <div
+                    className={`w-4 h-4 rounded-full bg-white absolute top-0.5 transition-transform ${
+                      wonState ? "translate-x-6" : "translate-x-0.5"
                     }`}
                   />
                 </button>
