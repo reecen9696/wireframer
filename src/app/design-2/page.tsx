@@ -40,8 +40,8 @@ type Round = {
 const mockRounds: Round[] = [
   {
     number: 53,
-    date: "05 May 2025",
-    time: "23:30",
+    date: "Aug 28",
+    time: "9:00 PM EST",
     numbers: [12, 24, 35, 42, 67],
     powerball: 18,
     results: [
@@ -320,6 +320,9 @@ export default function Design1Home() {
   const resultsRef = useRef<HTMLDivElement>(null);
   const { isWalletConnected, connectWallet } = useWallet();
 
+  // Check if current round is the most recent (hasn't been drawn yet)
+  const isCurrentRoundNotDrawn = currentRoundIndex === 0;
+
   // Countdown timer effect
   useEffect(() => {
     const timer = setInterval(() => {
@@ -532,34 +535,60 @@ export default function Design1Home() {
                         : "bg-white text-[#020202]"
                     }`}
                   >
-                    Results
+                    Prize Pool
                   </button>
-                  <button
-                    onClick={() => setTableView("tickets")}
-                    disabled={!isWalletConnected}
-                    className={`px-4 py-2 rounded-full border-2 border-[#020202] font-semibold min-w-[100px] ${
-                      !isWalletConnected
-                        ? "bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed"
-                        : tableView === "tickets"
-                        ? "bg-[#020202] text-white"
-                        : "bg-white text-[#020202]"
-                    }`}
-                  >
-                    Tickets
-                  </button>
-                  <button
-                    onClick={() => setTableView("winning")}
-                    disabled={!isWalletConnected}
-                    className={`px-4 py-2 rounded-full border-2 border-[#020202] font-semibold min-w-[140px] ${
-                      !isWalletConnected
-                        ? "bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed"
-                        : tableView === "winning"
-                        ? "bg-[#020202] text-white"
-                        : "bg-white text-[#020202]"
-                    }`}
-                  >
-                    Winning Tickets
-                  </button>
+                  <div className="relative">
+                    <button
+                      onClick={() =>
+                        !isCurrentRoundNotDrawn &&
+                        isWalletConnected &&
+                        setTableView("tickets")
+                      }
+                      disabled={!isWalletConnected || isCurrentRoundNotDrawn}
+                      className={`px-4 py-2 rounded-full border-2 border-[#020202] font-semibold min-w-[100px] ${
+                        !isWalletConnected || isCurrentRoundNotDrawn
+                          ? "bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed"
+                          : tableView === "tickets"
+                          ? "bg-[#020202] text-white"
+                          : "bg-white text-[#020202]"
+                      }`}
+                      title={
+                        !isWalletConnected
+                          ? "Connect wallet to view"
+                          : isCurrentRoundNotDrawn
+                          ? "Lottery has not been drawn"
+                          : ""
+                      }
+                    >
+                      Tickets
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <button
+                      onClick={() =>
+                        !isCurrentRoundNotDrawn &&
+                        isWalletConnected &&
+                        setTableView("winning")
+                      }
+                      disabled={!isWalletConnected || isCurrentRoundNotDrawn}
+                      className={`px-4 py-2 rounded-full border-2 border-[#020202] font-semibold min-w-[140px] ${
+                        !isWalletConnected || isCurrentRoundNotDrawn
+                          ? "bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed"
+                          : tableView === "winning"
+                          ? "bg-[#020202] text-white"
+                          : "bg-white text-[#020202]"
+                      }`}
+                      title={
+                        !isWalletConnected
+                          ? "Connect wallet to view"
+                          : isCurrentRoundNotDrawn
+                          ? "Lottery has not been drawn"
+                          : ""
+                      }
+                    >
+                      Winning Tickets
+                    </button>
+                  </div>
                 </div>
 
                 {/* Table Content Container - Fixed height to prevent jumping */}
@@ -650,83 +679,93 @@ export default function Design1Home() {
                     </div>
                   )}
 
-                  {/* Results Table */}
+                  {/* Prize Pool Table (formerly Results) */}
                   {tableView === "results" && (
                     <div className="overflow-x-auto">
-                      <table className="w-full border-collapse">
-                        <thead>
-                          <tr className="border-b-2 border-[#020202]">
-                            <th className="text-left p-4 text-lg font-bold text-[#020202]">
-                              Prize Divisions
-                            </th>
-                            <th className="text-left p-4 text-lg font-bold text-[#020202]">
-                              Prizes
-                            </th>
-                            <th className="text-left p-4 text-lg font-bold text-[#020202]">
-                              Combinations
-                            </th>
-                            <th className="text-left p-4 text-lg font-bold text-[#020202]">
-                              Winners
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {currentRound.results.map((result, index) => (
-                            <tr
-                              key={index}
-                              className="border-b border-[#E5E5E5]"
-                            >
-                              <td className="p-4 text-[#020202] font-semibold">
-                                {result.division}
-                              </td>
-                              <td className="p-4">
-                                <div className="flex items-center gap-2">
-                                  <Image
-                                    src={
-                                      currency === "ETH"
-                                        ? "/eth.svg"
-                                        : "/solana.svg"
-                                    }
-                                    alt={currency}
-                                    width={20}
-                                    height={20}
-                                  />
-                                  <span className="text-[#020202] font-bold">
-                                    {result.prize}
-                                  </span>
-                                </div>
-                              </td>
-                              <td className="p-4">
-                                <div className="flex gap-1 items-center">
-                                  {result.combinations.map((_, i) => (
-                                    <span
-                                      key={i}
-                                      className="w-6 h-6 rounded-full bg-yellow-300 border border-[#020202] flex items-center justify-center"
-                                    >
-                                      <span className="w-2 h-2 rounded-full bg-[#020202]"></span>
-                                    </span>
-                                  ))}
-                                  {result.powerballMatch && (
-                                    <span className="w-6 h-6 rounded-full bg-red-500 border border-[#020202] flex items-center justify-center ml-1">
-                                      <span className="w-2 h-2 rounded-full bg-white"></span>
-                                    </span>
-                                  )}
-                                </div>
-                              </td>
-                              <td className="p-4">
-                                <div className="flex items-center gap-2">
-                                  <span className="material-symbols-outlined text-[#020202]">
-                                    emoji_events
-                                  </span>
-                                  <span className="text-[#020202] font-bold">
-                                    {result.winners.toLocaleString()}
-                                  </span>
-                                </div>
-                              </td>
+                      {isCurrentRoundNotDrawn ? (
+                        <div className="text-center py-12">
+                          <p className="text-lg text-gray-400">
+                            Lottery has not been drawn yet
+                          </p>
+                        </div>
+                      ) : (
+                        <table className="w-full border-collapse">
+                          <thead>
+                            <tr className="border-b-2 border-[#020202]">
+                              <th className="text-left p-4 text-lg font-bold text-[#020202]">
+                                Prize Divisions
+                              </th>
+                              <th className="text-left p-4 text-lg font-bold text-[#020202]">
+                                Prizes
+                              </th>
+                              <th className="text-left p-4 text-lg font-bold text-[#020202]">
+                                Combinations
+                              </th>
+                              <th className="text-left p-4 text-lg font-bold text-[#020202]">
+                                Winners
+                              </th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                          </thead>
+                          <tbody>
+                            {currentRound.results.map((result, index) => (
+                              <tr
+                                key={index}
+                                className="border-b border-[#E5E5E5]"
+                              >
+                                <td className="p-4 text-[#020202] font-semibold">
+                                  {result.division}
+                                </td>
+                                <td className="p-4">
+                                  <div className="flex items-center gap-2">
+                                    <Image
+                                      src={
+                                        currency === "ETH"
+                                          ? "/eth.svg"
+                                          : "/solana.svg"
+                                      }
+                                      alt={currency}
+                                      width={20}
+                                      height={20}
+                                    />
+                                    <span className="text-[#020202] font-bold">
+                                      {result.prize}
+                                    </span>
+                                  </div>
+                                </td>
+                                <td className="p-4">
+                                  <div className="flex gap-1 items-center">
+                                    {result.combinations.map((_, i) => (
+                                      <span
+                                        key={i}
+                                        className="w-6 h-6 rounded-full bg-yellow-300 border border-[#020202] flex items-center justify-center"
+                                      >
+                                        <span className="w-2 h-2 rounded-full bg-[#020202]"></span>
+                                      </span>
+                                    ))}
+                                    {result.powerballMatch && (
+                                      <span className="w-6 h-6 rounded-full bg-red-500 border border-[#020202] flex items-center justify-center ml-1">
+                                        <span className="w-2 h-2 rounded-full bg-white"></span>
+                                      </span>
+                                    )}
+                                  </div>
+                                </td>
+                                <td className="p-4">
+                                  <div className="flex items-center gap-2">
+                                    <span className="material-symbols-outlined text-[#020202]">
+                                      emoji_events
+                                    </span>
+                                    <span className="text-[#020202] font-bold">
+                                      {isCurrentRoundNotDrawn
+                                        ? "-"
+                                        : result.winners.toLocaleString()}
+                                    </span>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      )}
                     </div>
                   )}
 
@@ -744,6 +783,12 @@ export default function Design1Home() {
                           >
                             Connect
                           </button>
+                        </div>
+                      ) : isCurrentRoundNotDrawn ? (
+                        <div className="text-center py-12">
+                          <p className="text-lg text-gray-400">
+                            Lottery has not been drawn yet
+                          </p>
                         </div>
                       ) : (
                         <table className="w-full border-collapse">
@@ -857,6 +902,12 @@ export default function Design1Home() {
                           >
                             Connect
                           </button>
+                        </div>
+                      ) : isCurrentRoundNotDrawn ? (
+                        <div className="text-center py-12">
+                          <p className="text-lg text-gray-400">
+                            Lottery has not been drawn yet
+                          </p>
                         </div>
                       ) : (
                         <table className="w-full border-collapse">
