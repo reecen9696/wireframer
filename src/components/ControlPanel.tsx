@@ -1,80 +1,114 @@
 "use client";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
-type ControlPanelProps = {
+interface ControlPanelProps {
   showResults?: boolean;
   onToggleResults?: (show: boolean) => void;
   showJackpot?: boolean;
   onToggleJackpot?: (show: boolean) => void;
-};
+  onTriggerWinEvent?: () => void;
+}
 
 export default function ControlPanel({
-  showResults = true,
+  showResults,
   onToggleResults,
-  showJackpot = false,
+  showJackpot,
   onToggleJackpot,
+  onTriggerWinEvent,
 }: ControlPanelProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const pathname = usePathname();
+  const panelRef = useRef<HTMLDivElement>(null);
 
-  const getPageToggles = () => {
-    if (pathname === "/design-2") {
-      return (
-        <div className="flex flex-col gap-2">
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={showResults}
-              onChange={(e) => onToggleResults?.(e.target.checked)}
-              className="accent-[#020202]"
-            />
-            <span className="text-[#020202] text-sm">Show Results History</span>
-          </label>
-        </div>
-      );
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
     }
 
-    if (pathname === "/design-2/ticket-selection") {
-      return (
-        <div className="flex flex-col gap-2">
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={showJackpot}
-              onChange={(e) => onToggleJackpot?.(e.target.checked)}
-              className="accent-[#020202]"
-            />
-            <span className="text-[#020202] text-sm">Show Jackpot Info</span>
-          </label>
-        </div>
-      );
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
     }
 
-    return (
-      <div className="text-[#020202] text-sm">No toggles for this page</div>
-    );
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
+
+  const handleWinEventToggle = () => {
+    if (onTriggerWinEvent) {
+      onTriggerWinEvent();
+      setIsOpen(false);
+    }
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50">
-      {/* Panel */}
-      {isOpen && (
-        <div className="bg-white border-2 border-[#020202] rounded-xl p-4 mb-2 shadow-lg min-w-[200px]">
-          <h3 className="text-[#020202] font-bold mb-3 text-sm">UI Controls</h3>
-          {getPageToggles()}
-        </div>
-      )}
-
-      {/* Toggle Button */}
+    <div className="fixed bottom-4 right-4 z-40" ref={panelRef}>
+      {/* Settings button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-12 h-12 bg-[#020202] text-white rounded-full flex items-center justify-center shadow-lg hover:bg-gray-800 transition-colors"
+        className="w-12 h-12 rounded-full bg-[#020202] text-white flex items-center justify-center shadow-lg hover:bg-gray-800"
       >
-        <span className="material-symbols-outlined">
-          {isOpen ? "close" : "settings"}
-        </span>
+        <span className="material-symbols-outlined">settings</span>
       </button>
+
+      {/* Control panel */}
+      {isOpen && (
+        <div className="absolute bottom-16 right-0 bg-white rounded-xl border-2 border-[#020202] shadow-lg p-4 w-64">
+          <h3 className="text-lg font-bold text-[#020202] mb-4">
+            Control Panel
+          </h3>
+
+          <div className="space-y-3">
+            {onToggleResults && (
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-[#020202]">Show Results</span>
+                <button
+                  onClick={() => onToggleResults(!showResults)}
+                  className={`w-12 h-6 rounded-full border-2 border-[#020202] relative transition-colors ${
+                    showResults ? "bg-green-500" : "bg-gray-300"
+                  }`}
+                >
+                  <div
+                    className={`w-4 h-4 rounded-full bg-white absolute top-0.5 transition-transform ${
+                      showResults ? "translate-x-6" : "translate-x-0.5"
+                    }`}
+                  />
+                </button>
+              </div>
+            )}
+
+            {onToggleJackpot && (
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-[#020202]">Show Jackpot</span>
+                <button
+                  onClick={() => onToggleJackpot(!showJackpot)}
+                  className={`w-12 h-6 rounded-full border-2 border-[#020202] relative transition-colors ${
+                    showJackpot ? "bg-green-500" : "bg-gray-300"
+                  }`}
+                >
+                  <div
+                    className={`w-4 h-4 rounded-full bg-white absolute top-0.5 transition-transform ${
+                      showJackpot ? "translate-x-6" : "translate-x-0.5"
+                    }`}
+                  />
+                </button>
+              </div>
+            )}
+
+            {onTriggerWinEvent && (
+              <div className="border-t border-gray-200 pt-3">
+                <button
+                  onClick={handleWinEventToggle}
+                  className="w-full rounded-full border-2 border-green-600 bg-green-600 text-white px-4 py-2 font-bold hover:bg-green-700"
+                >
+                  Win Event Toggle
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

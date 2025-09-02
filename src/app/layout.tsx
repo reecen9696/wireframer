@@ -6,13 +6,15 @@ import { WalletProvider } from "@/contexts/WalletContext";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Shuffle Casino Wireframes",
-  description: "Wireframe app for casino layouts.",
+  title: "Wireframe App",
+  description: "A Next.js wireframe application",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
       <head>
@@ -26,7 +28,9 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.className}>
-        <WalletProvider>{children}</WalletProvider>
+        <WalletProvider>
+          {children}
+        </WalletProvider>
       </body>
     </html>
   );

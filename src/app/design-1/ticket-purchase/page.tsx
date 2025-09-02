@@ -4,20 +4,10 @@ import Navbar from "@/components/Navbar";
 
 export default function TicketPurchase() {
   const [currency, setCurrency] = useState("ETH");
-  const [isWalletConnected, setIsWalletConnected] = useState(false);
-
-  const handleConnectWallet = () => {
-    setIsWalletConnected(!isWalletConnected);
-  };
 
   return (
     <>
-      <Navbar
-        currency={currency}
-        setCurrency={setCurrency}
-        isConnected={isWalletConnected}
-        onConnectWallet={handleConnectWallet}
-      />
+      <Navbar currency={currency} setCurrency={setCurrency} />
       <section className="w-full max-w-2xl mx-auto px-4 py-8 flex flex-col items-center">
         <h2 className="text-2xl font-bold mb-6 text-[#020202] text-center">
           Purchase Confirmation

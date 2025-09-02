@@ -4,6 +4,7 @@ import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import { Div } from "@/components/Div";
 import ControlPanel from "@/components/ControlPanel";
+import WinEventPopup from "@/components/WinEventPopup";
 import { useWallet } from "@/contexts/WalletContext";
 
 const NUMBERS = 69;
@@ -31,6 +32,7 @@ export default function Design2TicketSelection() {
   const [activeTicket, setActiveTicket] = useState<Ticket>(getEmptyTicket());
   const [showJackpot, setShowJackpot] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [showWinEvent, setShowWinEvent] = useState(false);
 
   const { isWalletConnected } = useWallet();
 
@@ -177,6 +179,14 @@ export default function Design2TicketSelection() {
         };
     }
   }
+
+  const handleTriggerWinEvent = () => {
+    setShowWinEvent(true);
+  };
+
+  const handleCloseWinEvent = () => {
+    setShowWinEvent(false);
+  };
 
   return (
     <>
@@ -461,6 +471,17 @@ export default function Design2TicketSelection() {
       <ControlPanel
         showJackpot={showJackpot}
         onToggleJackpot={setShowJackpot}
+        onTriggerWinEvent={handleTriggerWinEvent}
+      />
+
+      <WinEventPopup
+        isOpen={showWinEvent}
+        onClose={handleCloseWinEvent}
+        currency={currency}
+        winAmount="43.50000"
+        drawNumber={53}
+        winningNumbers={[12, 24, 35, 42, 55]}
+        powerball={18}
       />
     </>
   );

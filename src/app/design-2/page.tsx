@@ -5,6 +5,7 @@ import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import { Div } from "@/components/Div";
 import ControlPanel from "@/components/ControlPanel";
+import WinEventPopup from "@/components/WinEventPopup";
 import { useWallet } from "@/contexts/WalletContext";
 
 type Round = {
@@ -198,14 +199,11 @@ export default function Design1Home() {
   const [tableView, setTableView] = useState<"results" | "tickets" | "winning">(
     "results"
   );
+  const [showWinEvent, setShowWinEvent] = useState(false);
 
-  const { isWalletConnected } = useWallet();
+  const { isWalletConnected, connectWallet } = useWallet();
 
   const currentRound = mockRounds[currentRoundIndex];
-
-  const handleConnectWallet = () => {
-    setIsWalletConnected(!isWalletConnected);
-  };
 
   const goToPreviousRound = () => {
     if (currentRoundIndex < mockRounds.length - 1) {
@@ -217,6 +215,14 @@ export default function Design1Home() {
     if (currentRoundIndex > 0) {
       setCurrentRoundIndex(currentRoundIndex - 1);
     }
+  };
+
+  const handleTriggerWinEvent = () => {
+    setShowWinEvent(true);
+  };
+
+  const handleCloseWinEvent = () => {
+    setShowWinEvent(false);
   };
 
   return (
@@ -439,7 +445,7 @@ export default function Design1Home() {
                           Connect your wallet to view your tickets
                         </p>
                         <button
-                          onClick={handleConnectWallet}
+                          onClick={connectWallet}
                           className="rounded-full border-2 border-[#020202] bg-white text-[#020202] px-6 py-2 font-bold"
                         >
                           Connect Wallet
@@ -552,7 +558,7 @@ export default function Design1Home() {
                           Connect your wallet to view your winning tickets
                         </p>
                         <button
-                          onClick={handleConnectWallet}
+                          onClick={connectWallet}
                           className="rounded-full border-2 border-[#020202] bg-white text-[#020202] px-6 py-2 font-bold"
                         >
                           Connect Wallet
@@ -662,6 +668,17 @@ export default function Design1Home() {
       <ControlPanel
         showResults={showResults}
         onToggleResults={setShowResults}
+        onTriggerWinEvent={handleTriggerWinEvent}
+      />
+
+      <WinEventPopup
+        isOpen={showWinEvent}
+        onClose={handleCloseWinEvent}
+        currency={currency}
+        winAmount="485,420.31250"
+        drawNumber={52}
+        winningNumbers={[8, 15, 29, 44, 58]}
+        powerball={22}
       />
     </div>
   );
