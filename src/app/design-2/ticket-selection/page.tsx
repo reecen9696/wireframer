@@ -1,10 +1,12 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import { Div } from "@/components/Div";
 import ControlPanel from "@/components/ControlPanel";
 import WinEventPopup from "@/components/WinEventPopup";
+import PhantomTransactionPopup from "@/components/PhantomTransactionPopup";
 import { useWallet } from "@/contexts/WalletContext";
 
 const NUMBERS = 69;
@@ -35,8 +37,10 @@ export default function Design2TicketSelection() {
   const [showWinEvent, setShowWinEvent] = useState(false);
   const [wonState, setWonState] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [showPhantomPopup, setShowPhantomPopup] = useState(false);
 
   const { isWalletConnected } = useWallet();
+  const router = useRouter();
 
   // Add ticket to list
   function addTicket() {
@@ -114,7 +118,12 @@ export default function Design2TicketSelection() {
 
   // Toggle powerplay for active ticket
   function togglePowerPlay() {
-    setActiveTicket({ ...activeTicket, powerPlay: !activeTicket.powerPlay });
+    setActiveTicket({
+      ...activeTicket,
+      powerPlay: !activeTicket.powerPlay,
+      // Clear powerball when enabling PowerPlay
+      powerball: !activeTicket.powerPlay ? null : activeTicket.powerball,
+    });
   }
 
   // Select number for active ticket
@@ -137,7 +146,12 @@ export default function Design2TicketSelection() {
     if (activeTicket.powerball === n) {
       setActiveTicket({ ...activeTicket, powerball: null });
     } else {
-      setActiveTicket({ ...activeTicket, powerball: n });
+      setActiveTicket({
+        ...activeTicket,
+        powerball: n,
+        // Disable PowerPlay when selecting a powerball number
+        powerPlay: false,
+      });
     }
   }
 
@@ -149,6 +163,24 @@ export default function Design2TicketSelection() {
       setEditingIndex(editingIndex - 1);
     }
     setTickets(tickets.filter((_, i) => i !== idx));
+  }
+
+  // Randomize ticket numbers
+  function randomizeTicket(idx: number) {
+    const nums: number[] = [];
+    while (nums.length < 5) {
+      const n = Math.floor(Math.random() * NUMBERS) + 1;
+      if (!nums.includes(n)) nums.push(n);
+    }
+    
+    const updatedTickets = [...tickets];
+    updatedTickets[idx] = {
+      ...updatedTickets[idx],
+      numbers: nums,
+      powerball: Math.floor(Math.random() * POWERBALLS) + 1,
+      powerPlay: false // Reset powerPlay when randomizing
+    };
+    setTickets(updatedTickets);
   }
 
   // Calculate total
@@ -183,6 +215,35 @@ export default function Design2TicketSelection() {
     setShowWinEvent(false);
   };
 
+  const handleBuyNow = () => {
+    if (tickets.length > 0) {
+      setShowPhantomPopup(true);
+      // Scroll to top to see the popup
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  const handlePhantomAccept = () => {
+    setShowPhantomPopup(false);
+    // Navigate to home page
+    router.push("/");
+    // Set a timeout to allow page navigation and then scroll/open tickets
+    setTimeout(() => {
+      // Scroll to results section and open tickets tab
+      const resultsSection = document.querySelector('[data-section="results"]');
+      if (resultsSection) {
+        resultsSection.scrollIntoView({ behavior: "smooth" });
+      }
+      // Trigger tickets tab - we'll need to implement this in the main page
+      const event = new CustomEvent("openTicketsTab");
+      window.dispatchEvent(event);
+    }, 500);
+  };
+
+  const handlePhantomClose = () => {
+    setShowPhantomPopup(false);
+  };
+
   return (
     <>
       <Navbar currency={currency} setCurrency={setCurrency} />
@@ -211,7 +272,7 @@ export default function Design2TicketSelection() {
           } pb-12`}
         >
           {/* Left: Number Selector */}
-          <Div className="w-[70%] flex flex-col items-center py-12 ">
+          <Div className="flex-1 flex flex-col items-center py-12 min-w-0">
             <div className="w-full flex items-center mb-6 relative">
               <h2 className="absolute left-1/2 -translate-x-1/2 text-3xl font-bold text-[#020202] text-center">
                 {editingIndex !== null ? "Edit Ticket" : "Powerball"}
@@ -336,7 +397,7 @@ export default function Design2TicketSelection() {
             </div>
           </Div>
           {/* Right: Ticket List / Summary */}
-          <Div className="flex flex-col items-center px-2 py-12 relative w-[30%]">
+          <Div className="flex flex-col items-center px-2 py-12 relative min-w-[380px] max-w-[380px]">
             <aside className="p-4 flex flex-col items-start w-full h-full">
               <div className="w-full flex items-center justify-between mb-4">
                 <h3 className="text-xl font-bold text-[#020202]">
@@ -357,24 +418,24 @@ export default function Design2TicketSelection() {
                 {tickets.map((t, idx) => (
                   <div
                     key={idx}
-                    className={`flex items-center gap-2 rounded-lg p-3 w-full ${
+                    className={`flex items-center gap-2 rounded-lg p-3 w-full min-w-0 ${
                       editingIndex === idx
                         ? "bg-blue-100 border-2 border-blue-300"
                         : ""
                     }`}
                   >
                     {/* Numbers */}
-                    <div className="flex gap-2">
+                    <div className="flex gap-1 flex-shrink-0">
                       {t.numbers.map((n, i) => (
                         <span
                           key={i}
-                          className="w-8 h-8 rounded-full border-2 border-[#020202] flex items-center justify-center text-base font-bold text-[#020202]"
+                          className="w-7 h-7 rounded-full border-2 border-[#020202] flex items-center justify-center text-sm font-bold text-[#020202] flex-shrink-0"
                         >
                           {n}
                         </span>
                       ))}
                       <span
-                        className={`w-8 h-8 rounded-full border-2 flex items-center justify-center text-base font-bold ${
+                        className={`w-7 h-7 rounded-full border-2 flex items-center justify-center text-sm font-bold flex-shrink-0 ${
                           t.powerPlay
                             ? "bg-yellow-300 text-[#020202] border-yellow-300"
                             : t.powerball
@@ -386,15 +447,25 @@ export default function Design2TicketSelection() {
                       </span>
                     </div>
                     {/* Icons */}
-                    <div className="flex gap-2 ml-auto">
+                    <div className="flex gap-1 ml-auto flex-shrink-0">
                       <button
                         title="Edit"
                         className="text-[#020202]"
                         onClick={() => editTicket(idx)}
                         disabled={editingIndex !== null && editingIndex !== idx}
                       >
-                        <span className="material-symbols-outlined text-xl">
+                        <span className="material-symbols-outlined text-lg">
                           edit
+                        </span>
+                      </button>
+                      <button
+                        title="Randomize"
+                        className="text-[#020202]"
+                        onClick={() => randomizeTicket(idx)}
+                        disabled={editingIndex !== null && editingIndex !== idx}
+                      >
+                        <span className="material-symbols-outlined text-lg">
+                          bolt
                         </span>
                       </button>
                       <button
@@ -403,7 +474,7 @@ export default function Design2TicketSelection() {
                         onClick={() => removeTicket(idx)}
                         disabled={editingIndex !== null && editingIndex !== idx}
                       >
-                        <span className="material-symbols-outlined text-xl">
+                        <span className="material-symbols-outlined text-lg">
                           delete
                         </span>
                       </button>
@@ -454,7 +525,22 @@ export default function Design2TicketSelection() {
                       {getTotal().amount}
                     </span>
                   </div>
-                  <button className="rounded-full bg-[#020202] text-white px-6 py-3 text-base font-bold w-2/3">
+                  <button
+                    onClick={handleBuyNow}
+                    disabled={tickets.length === 0 || !isWalletConnected}
+                    className={`rounded-full px-6 py-3 text-base font-bold w-2/3 ${
+                      tickets.length === 0 || !isWalletConnected
+                        ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                        : "bg-[#020202] text-white hover:bg-gray-800"
+                    }`}
+                    title={
+                      !isWalletConnected
+                        ? "Connect wallet to buy tickets"
+                        : tickets.length === 0
+                        ? "Add tickets to buy"
+                        : ""
+                    }
+                  >
                     Buy Now
                   </button>
                 </div>
@@ -481,6 +567,13 @@ export default function Design2TicketSelection() {
         drawNumber={53}
         winningNumbers={[12, 24, 35, 42, 55]}
         powerball={18}
+      />
+
+      <PhantomTransactionPopup
+        isOpen={showPhantomPopup}
+        onClose={handlePhantomClose}
+        onAccept={handlePhantomAccept}
+        amount={getTotal().amount}
       />
     </>
   );

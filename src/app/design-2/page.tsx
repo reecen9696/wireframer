@@ -101,67 +101,38 @@ const mockRounds: Round[] = [
         powerball: 8,
         stake: "0.20000",
         winnings: "0.00000",
-        status: "lost",
+        status: "pending",
       },
       {
         numbers: [12, 24, 35, 42, 55],
         powerball: 18,
         stake: "0.20000",
-        winnings: "43.50000",
-        status: "won",
+        winnings: "0.00000",
+        status: "pending",
       },
       {
         numbers: [7, 19, 28, 33, 49],
         powerball: 15,
         stake: "0.20000",
         winnings: "0.00000",
-        status: "lost",
+        status: "pending",
       },
       {
         numbers: [1, 15, 29, 38, 62],
         powerball: 18,
         stake: "0.20000",
-        winnings: "8.75000",
-        status: "won",
+        winnings: "0.00000",
+        status: "pending",
       },
       {
         numbers: [9, 22, 31, 47, 68],
         powerball: 12,
         stake: "0.20000",
         winnings: "0.00000",
-        status: "lost",
-      },
-      {
-        numbers: [3, 18, 27, 44, 59],
-        powerball: 18,
-        stake: "0.20000",
-        winnings: "4.25000",
-        status: "won",
+        status: "pending",
       },
     ],
-    winningTickets: [
-      {
-        numbers: [12, 24, 35, 42, 55],
-        powerball: 18,
-        stake: "0.20000",
-        winnings: "43.50000",
-        division: "4th",
-      },
-      {
-        numbers: [1, 15, 29, 38, 62],
-        powerball: 18,
-        stake: "0.20000",
-        winnings: "8.75000",
-        division: "6th",
-      },
-      {
-        numbers: [3, 18, 27, 44, 59],
-        powerball: 18,
-        stake: "0.20000",
-        winnings: "4.25000",
-        division: "7th",
-      },
-    ],
+    winningTickets: [],
   },
   {
     number: 52,
@@ -347,6 +318,21 @@ export default function Design1Home() {
     return () => clearInterval(timer);
   }, []);
 
+  // Event listener for opening tickets tab from other pages
+  useEffect(() => {
+    const handleOpenTicketsTab = () => {
+      setTableView("tickets");
+      if (resultsRef.current) {
+        resultsRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+    };
+
+    window.addEventListener("openTicketsTab", handleOpenTicketsTab);
+    return () => {
+      window.removeEventListener("openTicketsTab", handleOpenTicketsTab);
+    };
+  }, []);
+
   const formatTime = (time: typeof timeLeft) => {
     return `${time.hours.toString().padStart(2, "0")}:${time.minutes
       .toString()
@@ -444,7 +430,11 @@ export default function Design1Home() {
         </div>
 
         {showResults && (
-          <div ref={resultsRef} className="w-full max-w-[1200px]">
+          <div
+            ref={resultsRef}
+            data-section="results"
+            className="w-full max-w-[1200px]"
+          >
             {/* Round Info */}
             <div className="flex justify-center mt-24">
               <Div className="rounded-full px-6 py-4 inline-block">
@@ -540,25 +530,17 @@ export default function Design1Home() {
                   <div className="relative">
                     <button
                       onClick={() =>
-                        !isCurrentRoundNotDrawn &&
-                        isWalletConnected &&
-                        setTableView("tickets")
+                        isWalletConnected && setTableView("tickets")
                       }
-                      disabled={!isWalletConnected || isCurrentRoundNotDrawn}
+                      disabled={!isWalletConnected}
                       className={`px-4 py-2 rounded-full border-2 border-[#020202] font-semibold min-w-[100px] ${
-                        !isWalletConnected || isCurrentRoundNotDrawn
+                        !isWalletConnected
                           ? "bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed"
                           : tableView === "tickets"
                           ? "bg-[#020202] text-white"
                           : "bg-white text-[#020202]"
                       }`}
-                      title={
-                        !isWalletConnected
-                          ? "Connect wallet to view"
-                          : isCurrentRoundNotDrawn
-                          ? "Lottery has not been drawn"
-                          : ""
-                      }
+                      title={!isWalletConnected ? "Connect wallet to view" : ""}
                     >
                       Tickets
                     </button>
@@ -783,12 +765,6 @@ export default function Design1Home() {
                           >
                             Connect
                           </button>
-                        </div>
-                      ) : isCurrentRoundNotDrawn ? (
-                        <div className="text-center py-12">
-                          <p className="text-lg text-gray-400">
-                            Lottery has not been drawn yet
-                          </p>
                         </div>
                       ) : (
                         <table className="w-full border-collapse">
