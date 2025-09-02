@@ -1,6 +1,9 @@
 "use client";
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { useWallet } from "@/contexts/WalletContext";
+import WalletDropdown from "./WalletDropdown";
 
 type NavbarProps = {
   currency: string;
@@ -8,15 +11,17 @@ type NavbarProps = {
 };
 
 export default function Navbar({ currency, setCurrency }: NavbarProps) {
+  const { isWalletConnected, connectWallet } = useWallet();
+
   return (
     <nav className="w-full flex items-center justify-between py-6 px-4 mb-8">
       {/* Left: Logo/Brand */}
-      <div className="flex items-center gap-2">
+      <Link href="/design-2" className="flex items-center gap-2">
         <span className="material-symbols-outlined text-3xl text-[#020202]">
           casino
         </span>
         <span className="text-2xl font-bold text-[#020202]">Shuffle</span>
-      </div>
+      </Link>
       {/* Center: Currency Dropdown */}
       <div className="flex-1 flex justify-center">
         <div className="flex items-center bg-white rounded-xl border-2 border-[#020202] px-6 py-2 gap-3 shadow-sm">
@@ -42,9 +47,16 @@ export default function Navbar({ currency, setCurrency }: NavbarProps) {
       </div>
       {/* Right: Wallet */}
       <div>
-        <button className="rounded-full border-2 border-[#020202] bg-white text-[#020202] px-6 py-2 font-bold">
-          Wallet
-        </button>
+        {isWalletConnected ? (
+          <WalletDropdown />
+        ) : (
+          <button
+            className="rounded-full border-2 border-[#020202] bg-white text-[#020202] px-6 py-2 font-bold"
+            onClick={connectWallet}
+          >
+            Connect Wallet
+          </button>
+        )}
       </div>
     </nav>
   );

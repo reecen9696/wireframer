@@ -5,6 +5,7 @@ import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import { Div } from "@/components/Div";
 import ControlPanel from "@/components/ControlPanel";
+import { useWallet } from "@/contexts/WalletContext";
 
 type Round = {
   number: number;
@@ -198,7 +199,13 @@ export default function Design1Home() {
     "results"
   );
 
+  const { isWalletConnected } = useWallet();
+
   const currentRound = mockRounds[currentRoundIndex];
+
+  const handleConnectWallet = () => {
+    setIsWalletConnected(!isWalletConnected);
+  };
 
   const goToPreviousRound = () => {
     if (currentRoundIndex < mockRounds.length - 1) {
@@ -320,8 +327,11 @@ export default function Design1Home() {
                   </button>
                   <button
                     onClick={() => setTableView("tickets")}
+                    disabled={!isWalletConnected}
                     className={`px-4 py-2 rounded-full border-2 border-[#020202] font-semibold ${
-                      tableView === "tickets"
+                      !isWalletConnected
+                        ? "bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed"
+                        : tableView === "tickets"
                         ? "bg-[#020202] text-white"
                         : "bg-white text-[#020202]"
                     }`}
@@ -330,8 +340,11 @@ export default function Design1Home() {
                   </button>
                   <button
                     onClick={() => setTableView("winning")}
+                    disabled={!isWalletConnected}
                     className={`px-4 py-2 rounded-full border-2 border-[#020202] font-semibold ${
-                      tableView === "winning"
+                      !isWalletConnected
+                        ? "bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed"
+                        : tableView === "winning"
                         ? "bg-[#020202] text-white"
                         : "bg-white text-[#020202]"
                     }`}
@@ -420,122 +433,38 @@ export default function Design1Home() {
                 {/* Tickets Table */}
                 {tableView === "tickets" && (
                   <div className="overflow-x-auto">
-                    <table className="w-full border-collapse">
-                      <thead>
-                        <tr className="border-b-2 border-[#020202]">
-                          <th className="text-left p-4 text-lg font-bold text-[#020202]">
-                            Your Lottery Numbers
-                          </th>
-                          <th className="text-left p-4 text-lg font-bold text-[#020202]">
-                            Stake
-                          </th>
-                          <th className="text-left p-4 text-lg font-bold text-[#020202]">
-                            Winnings
-                          </th>
-                          <th className="text-left p-4 text-lg font-bold text-[#020202]">
-                            Status
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {currentRound.tickets.map((ticket, index) => (
-                          <tr key={index} className="border-b border-[#E5E5E5]">
-                            <td className="p-4">
-                              <div className="flex gap-2 items-center">
-                                {ticket.numbers.map((num, i) => (
-                                  <span
-                                    key={i}
-                                    className="w-8 h-8 rounded-full border-2 border-[#020202] bg-[#eaeaea] text-[#020202] flex items-center justify-center text-sm font-bold"
-                                  >
-                                    {num}
-                                  </span>
-                                ))}
-                                <span className="w-8 h-8 rounded-full border-2 border-red-500 bg-red-500 text-white flex items-center justify-center text-sm font-bold">
-                                  {ticket.powerball}
-                                </span>
-                              </div>
-                            </td>
-                            <td className="p-4">
-                              <div className="flex items-center gap-2">
-                                <Image
-                                  src={
-                                    currency === "ETH"
-                                      ? "/eth.svg"
-                                      : "/solana.svg"
-                                  }
-                                  alt={currency}
-                                  width={20}
-                                  height={20}
-                                />
-                                <span className="text-[#020202] font-bold">
-                                  {ticket.stake}
-                                </span>
-                              </div>
-                            </td>
-                            <td className="p-4">
-                              <div className="flex items-center gap-2">
-                                <Image
-                                  src={
-                                    currency === "ETH"
-                                      ? "/eth.svg"
-                                      : "/solana.svg"
-                                  }
-                                  alt={currency}
-                                  width={20}
-                                  height={20}
-                                />
-                                <span className="text-[#020202] font-bold">
-                                  {ticket.winnings}
-                                </span>
-                              </div>
-                            </td>
-                            <td className="p-4">
-                              <span
-                                className={`px-3 py-1 rounded-full text-sm font-bold ${
-                                  ticket.status === "won"
-                                    ? "bg-green-100 text-green-800"
-                                    : ticket.status === "lost"
-                                    ? "bg-red-100 text-red-800"
-                                    : "bg-yellow-100 text-yellow-800"
-                                }`}
-                              >
-                                {ticket.status === "won"
-                                  ? "Won"
-                                  : ticket.status === "lost"
-                                  ? "Lost"
-                                  : "Pending"}
-                              </span>
-                            </td>
+                    {!isWalletConnected ? (
+                      <div className="text-center py-12">
+                        <p className="text-lg text-gray-400 mb-4">
+                          Connect your wallet to view your tickets
+                        </p>
+                        <button
+                          onClick={handleConnectWallet}
+                          className="rounded-full border-2 border-[#020202] bg-white text-[#020202] px-6 py-2 font-bold"
+                        >
+                          Connect Wallet
+                        </button>
+                      </div>
+                    ) : (
+                      <table className="w-full border-collapse">
+                        <thead>
+                          <tr className="border-b-2 border-[#020202]">
+                            <th className="text-left p-4 text-lg font-bold text-[#020202]">
+                              Your Lottery Numbers
+                            </th>
+                            <th className="text-left p-4 text-lg font-bold text-[#020202]">
+                              Stake
+                            </th>
+                            <th className="text-left p-4 text-lg font-bold text-[#020202]">
+                              Winnings
+                            </th>
+                            <th className="text-left p-4 text-lg font-bold text-[#020202]">
+                              Status
+                            </th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-
-                {/* Winning Tickets Table */}
-                {tableView === "winning" && (
-                  <div className="overflow-x-auto">
-                    <table className="w-full border-collapse">
-                      <thead>
-                        <tr className="border-b-2 border-[#020202]">
-                          <th className="text-left p-4 text-lg font-bold text-[#020202]">
-                            Your Lottery Numbers
-                          </th>
-                          <th className="text-left p-4 text-lg font-bold text-[#020202]">
-                            Stake
-                          </th>
-                          <th className="text-left p-4 text-lg font-bold text-[#020202]">
-                            Winnings
-                          </th>
-                          <th className="text-left p-4 text-lg font-bold text-[#020202]">
-                            Division
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {currentRound.winningTickets.length > 0 ? (
-                          currentRound.winningTickets.map((ticket, index) => (
+                        </thead>
+                        <tbody>
+                          {currentRound.tickets.map((ticket, index) => (
                             <tr
                               key={index}
                               className="border-b border-[#E5E5E5]"
@@ -590,23 +519,138 @@ export default function Design1Home() {
                                 </div>
                               </td>
                               <td className="p-4">
-                                <span className="px-3 py-1 rounded-full bg-green-100 text-green-800 text-sm font-bold">
-                                  {ticket.division}
+                                <span
+                                  className={`px-3 py-1 rounded-full text-sm font-bold ${
+                                    ticket.status === "won"
+                                      ? "bg-green-100 text-green-800"
+                                      : ticket.status === "lost"
+                                      ? "bg-red-100 text-red-800"
+                                      : "bg-yellow-100 text-yellow-800"
+                                  }`}
+                                >
+                                  {ticket.status === "won"
+                                    ? "Won"
+                                    : ticket.status === "lost"
+                                    ? "Lost"
+                                    : "Pending"}
                                 </span>
                               </td>
                             </tr>
-                          ))
-                        ) : (
-                          <tr>
-                            <td colSpan={4} className="p-8 text-center">
-                              <p className="text-lg text-[#020202]">
-                                No winning tickets for this round
-                              </p>
-                            </td>
+                          ))}
+                        </tbody>
+                      </table>
+                    )}
+                  </div>
+                )}
+
+                {/* Winning Tickets Table */}
+                {tableView === "winning" && (
+                  <div className="overflow-x-auto">
+                    {!isWalletConnected ? (
+                      <div className="text-center py-12">
+                        <p className="text-lg text-gray-400 mb-4">
+                          Connect your wallet to view your winning tickets
+                        </p>
+                        <button
+                          onClick={handleConnectWallet}
+                          className="rounded-full border-2 border-[#020202] bg-white text-[#020202] px-6 py-2 font-bold"
+                        >
+                          Connect Wallet
+                        </button>
+                      </div>
+                    ) : (
+                      <table className="w-full border-collapse">
+                        <thead>
+                          <tr className="border-b-2 border-[#020202]">
+                            <th className="text-left p-4 text-lg font-bold text-[#020202]">
+                              Your Lottery Numbers
+                            </th>
+                            <th className="text-left p-4 text-lg font-bold text-[#020202]">
+                              Stake
+                            </th>
+                            <th className="text-left p-4 text-lg font-bold text-[#020202]">
+                              Winnings
+                            </th>
+                            <th className="text-left p-4 text-lg font-bold text-[#020202]">
+                              Division
+                            </th>
                           </tr>
-                        )}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody>
+                          {currentRound.winningTickets.length > 0 ? (
+                            currentRound.winningTickets.map((ticket, index) => (
+                              <tr
+                                key={index}
+                                className="border-b border-[#E5E5E5]"
+                              >
+                                <td className="p-4">
+                                  <div className="flex gap-2 items-center">
+                                    {ticket.numbers.map((num, i) => (
+                                      <span
+                                        key={i}
+                                        className="w-8 h-8 rounded-full border-2 border-[#020202] bg-[#eaeaea] text-[#020202] flex items-center justify-center text-sm font-bold"
+                                      >
+                                        {num}
+                                      </span>
+                                    ))}
+                                    <span className="w-8 h-8 rounded-full border-2 border-red-500 bg-red-500 text-white flex items-center justify-center text-sm font-bold">
+                                      {ticket.powerball}
+                                    </span>
+                                  </div>
+                                </td>
+                                <td className="p-4">
+                                  <div className="flex items-center gap-2">
+                                    <Image
+                                      src={
+                                        currency === "ETH"
+                                          ? "/eth.svg"
+                                          : "/solana.svg"
+                                      }
+                                      alt={currency}
+                                      width={20}
+                                      height={20}
+                                    />
+                                    <span className="text-[#020202] font-bold">
+                                      {ticket.stake}
+                                    </span>
+                                  </div>
+                                </td>
+                                <td className="p-4">
+                                  <div className="flex items-center gap-2">
+                                    <Image
+                                      src={
+                                        currency === "ETH"
+                                          ? "/eth.svg"
+                                          : "/solana.svg"
+                                      }
+                                      alt={currency}
+                                      width={20}
+                                      height={20}
+                                    />
+                                    <span className="text-[#020202] font-bold">
+                                      {ticket.winnings}
+                                    </span>
+                                  </div>
+                                </td>
+                                <td className="p-4">
+                                  <span className="px-3 py-1 rounded-full bg-green-100 text-green-800 text-sm font-bold">
+                                    {ticket.division}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr>
+                              <td colSpan={4} className="p-8 text-center">
+                                <p className="text-lg text-[#020202]">
+                                  No winning tickets for this round
+                                </p>
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    )}
                   </div>
                 )}
               </Div>

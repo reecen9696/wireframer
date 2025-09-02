@@ -4,6 +4,7 @@ import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import { Div } from "@/components/Div";
 import ControlPanel from "@/components/ControlPanel";
+import { useWallet } from "@/contexts/WalletContext";
 
 const NUMBERS = 69;
 const POWERBALLS = 26;
@@ -29,6 +30,9 @@ export default function Design2TicketSelection() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [activeTicket, setActiveTicket] = useState<Ticket>(getEmptyTicket());
   const [showJackpot, setShowJackpot] = useState(false);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+
+  const { isWalletConnected } = useWallet();
 
   // Add ticket to list
   function addTicket() {
@@ -36,9 +40,30 @@ export default function Design2TicketSelection() {
       activeTicket.numbers.length === 5 &&
       (activeTicket.powerball || activeTicket.powerPlay)
     ) {
-      setTickets([...tickets, activeTicket]);
+      if (editingIndex !== null) {
+        // Update existing ticket
+        const updatedTickets = [...tickets];
+        updatedTickets[editingIndex] = activeTicket;
+        setTickets(updatedTickets);
+        setEditingIndex(null);
+      } else {
+        // Add new ticket
+        setTickets([...tickets, activeTicket]);
+      }
       setActiveTicket(getEmptyTicket());
     }
+  }
+
+  // Edit existing ticket
+  function editTicket(idx: number) {
+    setActiveTicket(tickets[idx]);
+    setEditingIndex(idx);
+  }
+
+  // Cancel editing
+  function cancelEdit() {
+    setActiveTicket(getEmptyTicket());
+    setEditingIndex(null);
   }
 
   // Quick pick for active ticket
@@ -114,6 +139,11 @@ export default function Design2TicketSelection() {
 
   // Remove ticket from list
   function removeTicket(idx: number) {
+    if (editingIndex === idx) {
+      cancelEdit();
+    } else if (editingIndex !== null && editingIndex > idx) {
+      setEditingIndex(editingIndex - 1);
+    }
     setTickets(tickets.filter((_, i) => i !== idx));
   }
 
@@ -179,8 +209,16 @@ export default function Design2TicketSelection() {
           <Div className="w-[70%] flex flex-col items-center py-12 ">
             <div className="w-full flex items-center mb-6 relative">
               <h2 className="absolute left-1/2 -translate-x-1/2 text-3xl font-bold text-[#020202] text-center">
-                Powerball
+                {editingIndex !== null ? "Edit Ticket" : "Powerball"}
               </h2>
+              {editingIndex !== null && (
+                <button
+                  className="absolute right-0 rounded-full border-2 border-[#020202] px-4 py-1 text-[#020202] font-semibold"
+                  onClick={cancelEdit}
+                >
+                  Cancel
+                </button>
+              )}
             </div>
             {/* Selected numbers */}
             <div className="flex gap-2 mb-4 justify-center">
@@ -223,14 +261,18 @@ export default function Design2TicketSelection() {
                 Auto Fill
               </button>
               <button
-                className="rounded-full border-2 border-[#020202] px-4 py-1 text-white font-semibold bg-[#020202]"
+                className={`rounded-full border-2 border-[#020202] px-4 py-1 font-semibold ${
+                  editingIndex !== null
+                    ? "bg-green-600 text-white border-green-600"
+                    : "bg-[#020202] text-white"
+                }`}
                 onClick={addTicket}
                 disabled={
                   activeTicket.numbers.length !== 5 ||
                   (!activeTicket.powerball && !activeTicket.powerPlay)
                 }
               >
-                Add Ticket
+                {editingIndex !== null ? "Save Changes" : "Add Ticket"}
               </button>
             </div>
             {/* Number grid */}
@@ -310,7 +352,11 @@ export default function Design2TicketSelection() {
                 {tickets.map((t, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center gap-2 rounded-lg p-3 w-full"
+                    className={`flex items-center gap-2 rounded-lg p-3 w-full ${
+                      editingIndex === idx
+                        ? "bg-blue-100 border-2 border-blue-300"
+                        : ""
+                    }`}
                   >
                     {/* Numbers */}
                     <div className="flex gap-2">
@@ -337,20 +383,20 @@ export default function Design2TicketSelection() {
                     {/* Icons */}
                     <div className="flex gap-2 ml-auto">
                       <button
-                        title="PowerPlay"
-                        className={
-                          t.powerPlay ? "text-yellow-500" : "text-[#020202]"
-                        }
-                        onClick={() => togglePowerPlayTicket(idx)}
+                        title="Edit"
+                        className="text-[#020202]"
+                        onClick={() => editTicket(idx)}
+                        disabled={editingIndex !== null && editingIndex !== idx}
                       >
                         <span className="material-symbols-outlined text-xl">
-                          bolt
+                          edit
                         </span>
                       </button>
                       <button
                         title="Delete"
                         className="text-[#020202]"
                         onClick={() => removeTicket(idx)}
+                        disabled={editingIndex !== null && editingIndex !== idx}
                       >
                         <span className="material-symbols-outlined text-xl">
                           delete
